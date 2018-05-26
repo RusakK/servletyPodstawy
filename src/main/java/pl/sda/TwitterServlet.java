@@ -6,21 +6,24 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class TwitterServlet extends HttpServlet {
 
 
-    private List<String> messages;
+    private static final String AUTHOR = "Author";
+    private static final String DEFAULT_AUTHOR = "Anonim";
+    private List<Message> messages;
     private static String NEW_MESSAGE = "message";
 
     @Override
     public void init() throws ServletException {
         messages = new ArrayList<>();
-        messages.add("wiadomośc 1");
-        messages.add("wiadomośc 2");
+        
 
     }
 
@@ -35,8 +38,8 @@ public class TwitterServlet extends HttpServlet {
         messages.forEach(message-> showMessage(out, message));
     }
 
-    private void showMessage(PrintWriter out, String message) {
-        out.println("<h3>" + message + "</h3>");
+    private void showMessage(PrintWriter out, Message message) {
+        out.println("<h3>" +message.getMessage() + "</h3>");
 
     }
 
@@ -44,9 +47,11 @@ public class TwitterServlet extends HttpServlet {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         String newMessage = req.getParameter(NEW_MESSAGE);
+        String autor = Optional.ofNullable(req.getParameter(AUTHOR)).orElse(DEFAULT_AUTHOR);
 
         if(newMessage != null) {
-            messages.add(newMessage);
+            Message message = new Message(newMessage, autor, LocalDateTime.now());
+            messages.add(message);
         }
 
         doGet(req, resp);
