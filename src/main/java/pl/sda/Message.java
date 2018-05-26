@@ -1,16 +1,18 @@
 package pl.sda;
 
+import pl.sda.users.User;
+
 import java.time.LocalDateTime;
 
 public class Message {
     private String content;
 
-    private String autor;
+    private User autor;
     private LocalDateTime created;
 
     public Message(){}
 
-    public Message(String content, String autor, LocalDateTime created) {
+    public Message(String content, User autor, LocalDateTime created) {
         this.content = content;
         this.autor = autor;
         this.created = created;
@@ -24,11 +26,11 @@ public class Message {
         this.content = content;
     }
 
-    public String getAutor() {
+    public User getAutor() {
         return autor;
     }
 
-    public void setAutor(String autor) {
+    public void setAutor(User autor) {
         this.autor = autor;
     }
 
@@ -42,6 +44,8 @@ public class Message {
 
     public String getMessage(){
 
-        return created.toString() + " " + autor + " " + content;
+        String userName = (autor != null) ? autor.getUsername() : "Anonymous";
+
+        return created.toString() + " " + userName + " " + content;
     }
 }

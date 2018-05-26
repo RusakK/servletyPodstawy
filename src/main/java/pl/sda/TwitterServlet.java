@@ -1,5 +1,7 @@
 package pl.sda;
 
+import pl.sda.users.User;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +12,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 public class TwitterServlet extends HttpServlet {
 
@@ -23,8 +24,6 @@ public class TwitterServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         messages = new ArrayList<>();
-        
-
     }
 
     @Override
@@ -38,22 +37,25 @@ public class TwitterServlet extends HttpServlet {
         messages.forEach(message-> showMessage(out, message));
     }
 
-    private void showMessage(PrintWriter out, Message message) {
-        out.println("<h3>" +message.getMessage() + "</h3>");
-
-    }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         String newMessage = req.getParameter(NEW_MESSAGE);
-        String autor = Optional.ofNullable(req.getParameter(AUTHOR)).orElse(DEFAULT_AUTHOR);
+        User author = Optional.ofNullable(req.getAttribute(UserFilter.USER_ATRIBUTE))
+                .filter(o -> o instanceof User)
+                .map(o -> (User) o)
+                .orElse(null);
 
         if(newMessage != null) {
-            Message message = new Message(newMessage, autor, LocalDateTime.now());
+            Message message = new Message(newMessage, author, LocalDateTime.now());
             messages.add(message);
         }
 
         doGet(req, resp);
+    }
+    private void showMessage(PrintWriter out, Message message) {
+        out.println("<h3>" +message.getMessage() + "</h3>");
+
     }
 }
